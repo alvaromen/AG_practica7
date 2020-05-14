@@ -14,12 +14,15 @@ import java.util.ArrayList;
 class Node {
 
     private Node father;
-    ArrayList<Vect3d> points;
+    private ArrayList<Triangle3d> triangles;
     private AABB aabb;
-    int level;
-    Octree octree;
-    Node[] sons;
-    boolean sonsInstantiated;
+    private int level;
+    private Octree octree;
+    private Node[] sons;
+    private boolean sonsInstantiated;
+    private boolean esHoja;
+    private int maxSons;
+    
 
     public Node(Node father, AABB aabb, int level, Octree octree) {
         this.father = father;
@@ -30,59 +33,28 @@ class Node {
         for (int i = 0; i < 8; i++) {
             sons[i] = null;
         }
-        points = new ArrayList<Vect3d>();
+        triangles = new ArrayList<Triangle3d>();
         sonsInstantiated = false;
+        esHoja = true;
+        maxSons = 10;
     }
 
-    public void insertPoint(Vect3d p) {
+    public void insertTriangle(Triangle3d t) {
         if (level == octree.getMaxLevel()) {
-            points.add(p);
+            triangles.add(t);
         } else {
-            if (!sonsInstantiated) {
-                instantiateSons();
-            }
-            double coorX = p.getX();
-            double coorY = p.getY();
-            double coorZ = p.getZ();
-            
-            double minX = aabb.getMin().getX();
-            double minY = aabb.getMin().getY();
-            double minZ = aabb.getMin().getZ();
-            
-            double maxX = aabb.getMax().getX();
-            double maxY = aabb.getMax().getY();
-            double maxZ = aabb.getMax().getZ();
-            
-            double medX = (maxX + minX) / 2;
-            double medY = (maxY + minY) / 2;
-            double medZ = (maxZ + maxZ) / 2;
-            
-            if(coorY >= medY){
-                if(coorX >= medX){
-                    if(coorZ >= medZ){
-                        sons[7].insertPoint(p);
-                    } else {
-                        sons[5].insertPoint(p);
-                    }
-                } else {
-                    if(coorZ >= medZ){
-                        sons[6].insertPoint(p);
-                    } else {
-                        sons[4].insertPoint(p);
+            if(esHoja){
+                triangles.add(t);
+                if(triangles.size() > maxSons){
+                    if (!sonsInstantiated) { //it should instantiate anyway but lets check it
+                        instantiateSons();
+                        esHoja = false;
                     }
                 }
             } else {
-                if(coorX >= medX){
-                    if(coorZ >= medZ){
-                        sons[3].insertPoint(p);
-                    } else {
-                        sons[1].insertPoint(p);
-                    }
-                } else {
-                    if(coorZ >= medZ){
-                        sons[2].insertPoint(p);
-                    } else {
-                        sons[0].insertPoint(p);
+                for(int i = 0; i < sons.length; i++){
+                    if(triangles.get(i).getAABB().testAABBAABB(sons[i].aabb)){
+                        sons[i].insertTriangle(triangles.get(i));
                     }
                 }
             }
@@ -90,6 +62,7 @@ class Node {
     }
 
     void instantiateSons() {
+        
         double minX = aabb.getMin().getX();
         double minY = aabb.getMin().getY();
         double minZ = aabb.getMin().getZ();
@@ -149,34 +122,41 @@ class Node {
                                     new Vect3d(medX, minY, medZ),
                                     new Vect3d(maxX, medY, maxZ)),
                             level+1, octree);
+        
+        for(int i = 0; i < triangles.size(); i++){
+           for(int j = 0; j < sons.length; j++){
+               if(triangles.get(i).getAABB().testAABBAABB(sons[j].aabb)){
+                   sons[j].insertTriangle(triangles.get(i));
+               }
+           }
+        }
+        
+        triangles.clear();
+        
+        sonsInstantiated = true;
     }
 }
 
 public class Octree {
 
-    private int nPoints;
-    private ArrayList<Vect3d> vPoints;
+    private ArrayList<Triangle3d> triangles;
     private int maxLevel;
     private Node root;
-
     /*
     public Octree() {
         maxLevel = 4;
         nPoints = 0;
-        vPoints = new ArrayList<Vect3d>();
+        vPoints = new ArrayList<Triangle3d>();
         root = new Node();
     }
     */
-    public Octree(PointCloud3d pc, int maxLevel) {
+    public Octree(TriangleMesh mesh, int maxLevel) {
         this.maxLevel = maxLevel;
-        nPoints = pc.size();
-        vPoints = new ArrayList<Vect3d>();
-        AABB aabb = pc.getAABB();
+        triangles = mesh.getTriangles();
+        AABB aabb = mesh.getAABB();
         root = new Node(null, aabb, 0, this);
-        for (int i = 0; i < nPoints; i++) {
-            Vect3d p = pc.getPoint(i);
-            vPoints.add(p);
-            root.insertPoint(p);
+        for (int i = 0; i < triangles.size(); i++) {
+            root.insertTriangle(triangles.get(i));
         }
     }
 

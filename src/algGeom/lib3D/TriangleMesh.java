@@ -38,7 +38,7 @@ public final class TriangleMesh {
         }
     }
 
-    public ArrayList<Triangle3d> getTriangules() {
+    public ArrayList<Triangle3d> getTriangles() {
         ArrayList<Triangle3d> triangles = new ArrayList<Triangle3d>();
         for (int i = 0; i < faces.size(); i++) {
             Face f = faces.get(i);
@@ -256,7 +256,7 @@ public final class TriangleMesh {
     }
     
     public boolean rayTraversalExh(Ray3d r, Vect3d p, Triangle3d t){
-        ArrayList<Triangle3d> triangles = getTriangules();
+        ArrayList<Triangle3d> triangles = getTriangles();
         double minDistance = BasicGeom.INFINITY;
         for(int i = 0; i < triangles.size(); i++){
             Vect3d q = new Vect3d();
@@ -273,7 +273,7 @@ public final class TriangleMesh {
     }
     
     public boolean rayTraversalExh(Ray3d r, ArrayList<Vect3d> p, ArrayList<Triangle3d> t){
-        ArrayList<Triangle3d> triangles = getTriangules();
+        ArrayList<Triangle3d> triangles = getTriangles();
         boolean intersect = false;
         for(int i = 0; i < triangles.size(); i++){
             Vect3d q = new Vect3d();

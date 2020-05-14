@@ -141,7 +141,7 @@ public class VoxelModel {
         ArrayList<Pair<Vect3d, Triangle3d>> Q = new ArrayList<Pair<Vect3d, Triangle3d>>();
         HashMap<Triangle3d, Integer> C = new HashMap<Triangle3d, Integer>();
 
-        ArrayList<Triangle3d> triangles = mesh.getTriangules();
+        ArrayList<Triangle3d> triangles = mesh.getTriangles();
 
         for (int i = 0; i < triangles.size(); i++) {
             Q.add(new Pair(triangles.get(i).getA(), triangles.get(i)));

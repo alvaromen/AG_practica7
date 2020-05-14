@@ -169,6 +169,50 @@ public class Triangle3d {
             return PointPosition.COPLANAR;
         }
     }
+    
+    public AABB getAABB(){
+        double xMin = a.getX();
+        double xMax = a.getX();
+        double yMin = a.getY();
+        double yMax = a.getY();
+        double zMin = a.getZ();
+        double zMax = a.getZ();
+        
+        if(b.getX() < xMin){
+            if(c.getX() < b.getX()){
+                xMin = c.getX();
+            } else xMin = b.getX();
+        }
+        if(xMax < b.getX()){
+            if(b.getX() < c.getX()){
+                xMax = c.getX();
+            } else xMax = b.getX();
+        }
+        
+        if(b.getY() < yMin){
+            if(c.getY() < b.getY()){
+                yMin = c.getY();
+            } else yMin = b.getY();
+        }
+        if(yMax < b.getY()){
+            if(b.getY() < c.getY()){
+                yMax = c.getY();
+            } else yMax = b.getY();
+        }
+        
+        if(b.getZ() < zMin){
+            if(c.getZ() < b.getZ()){
+                zMin = c.getZ();
+            } else zMin = b.getZ();
+        }
+        if(zMax < b.getZ()){
+            if(b.getZ() < c.getZ()){
+                zMax = c.getZ();
+            } else zMax = b.getZ();
+        }
+        
+        return new AABB(new Vect3d(xMin, yMin, zMin), new Vect3d(xMax, yMax, zMax));
+    }
 
     public boolean ray_tri(Ray3d r, Vect3d p) {
         Vect3d dirVector = r.dest.sub(r.orig);
