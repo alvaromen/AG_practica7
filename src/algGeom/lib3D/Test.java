@@ -136,24 +136,8 @@ public class Test extends Frame implements GLEventListener,
     static boolean visualizeAxis = true;
 
     DrawAxis dAxis = new DrawAxis();
-    DrawTriangle3d dt, dtp;
-    DrawPlane dpl;
-    DrawPointCloud3d dcloud;
-    DrawPointCloud3d dupper;
-    DrawPointCloud3d dlower;
-    DrawPointCloud3d dlay;
-    DrawTriangle3d dprojTr;
-    DrawRay3d dr;
-    DrawAABB dbb;
-    DrawVect3d dpc;
-    DrawVect3d dpf;
-    DrawVect3d dpi1;
-    DrawVect3d dpi2;
-    DrawLine3d dl;
-    DrawTriangleMesh dcat;
-    PointCloud3d pc;
-    ArrayList<DrawVect3d> positivos = new ArrayList<DrawVect3d>();
-    ArrayList<DrawVect3d> negativos = new ArrayList<DrawVect3d>();
+    DrawTriangleMesh dtm1;
+    DrawTriangleMesh dtm2;
 
     public void initLight(GL gl) {
         gl.glPushMatrix();
@@ -176,48 +160,19 @@ public class Test extends Frame implements GLEventListener,
 
     }
 
-    public void initExerciseA() {
-//        try {
-
-        // Se genera una lista de puntos   
-//    List pts = severalPoints();
-//    System.out.println("# pts: " + pts.size());
-        // se hace la triangulación de Delaunay con esa lista de puntos 
-//    DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-//    builder.setSites(pts);
-        // extraemos la geometría resultante como triángulos 
-//    Geometry g = builder.getTriangles(geomFact);            
-//    List<Geometry> triangles = new ArrayList<Geometry>(g.getNumGeometries());
-        // se crea un lista de triángulos 
-//    for(int i = 0; i < g.getNumGeometries(); ++i) {
-//        triangles.add(g.getGeometryN(i));
-//    }
-        pc = new PointCloud3d(100);
-        dcloud = new DrawPointCloud3d(pc);
-        TDelaunay delaunay = new TDelaunay(pc);
-
-        for (int i = 0; i < delaunay.getTriangles().size(); ++i) {
-            System.out.println(delaunay.getTriangles().get(i));
-            
+    public void initExerciseA(GL gl) {
+        try {
+            TriangleMesh mesh1 = new TriangleMesh("modelos/cat.obj");
+            dtm1 = new DrawTriangleMesh(mesh1);
+            TriangleMesh mesh2 = new TriangleMesh("modelos/cat.obj");
+            mesh2.translate(new Vect3d(200, 0, 0));
+            dtm2 = new DrawTriangleMesh(mesh2);
+            Octree tree1 = new Octree(mesh1, 8);
+            Octree tree2 = new Octree(mesh2, 8);
+            System.out.println(tree1.collision(tree2));
+        } catch (IOException ex) {
+            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        // se muestra la lista de triángulos             
-//            for (int i = 0; i < delaunay.getTriangles().size(); ++i) {
-//                System.out.println(triangles.get(i));
-//            }
-        // se han creado 6 triángulos 
-//            System.out.println(" Número de geometrías: " + g.getNumGeometries());
-//
-//            // añadimos un nuevo punto a la triangulación anterior 
-//            IncrementalDelaunayTriangulator idt = new IncrementalDelaunayTriangulator(builder.getSubdivision());
-//            idt.insertSite(new Vertex(9, 0));
-//
-//            // el número de triángulos de ha incrementado a 7 
-//            g = builder.getTriangles(geomFact);
-//            System.out.println(" Número de geometrías: " + g.getNumGeometries());
-//        } catch (IOException ex) {
-//            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }
 
     public void init(GLAutoDrawable drawable) {
@@ -243,7 +198,7 @@ public class Test extends Frame implements GLEventListener,
 
         initLight(gl);
 
-        initExerciseA();
+        initExerciseA(gl);
 
         drawable.addMouseListener(this);
         drawable.addMouseMotionListener(this);
@@ -273,17 +228,8 @@ public class Test extends Frame implements GLEventListener,
     }
 
     public void displayExerciseA(GL gl) {
-        dcloud.drawObject(gl);
-
-        for (int i = 0; i < positivos.size(); i++) {
-
-            positivos.get(i).drawObjectC(gl, 0, 0, 1);
-        }
-
-        for (int i = 0; i < negativos.size(); i++) {
-
-            negativos.get(i).drawObjectC(gl, 1, 0, 0);
-        }
+        dtm1.drawObjectC(gl, 1, 0, 0);
+        dtm2.drawObjectC(gl, 0, 0, 1);
     }
 
     public void display(GLAutoDrawable drawable) {

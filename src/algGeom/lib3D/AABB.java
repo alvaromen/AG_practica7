@@ -41,12 +41,12 @@ public class AABB {
         return max;
     }
     
-    public boolean testAABBAABB(AABB aabb){
-        if((Math.abs(getCenter().getX() - aabb.getCenter().getX())) > (getExtent().getX() + aabb.getExtent().getX()))
+    public boolean testAABBAABB(AABB other){
+        if((Math.abs(getCenter().getX() - other.getCenter().getX())) > (getExtent().getX() + other.getExtent().getX()))
             return false;
-        if((Math.abs(getCenter().getY() - aabb.getCenter().getY())) > (getExtent().getY() + aabb.getExtent().getY()))
+        if((Math.abs(getCenter().getY() - other.getCenter().getY())) > (getExtent().getY() + other.getExtent().getY()))
             return false;
-        if((Math.abs(getCenter().getZ() - aabb.getCenter().getZ())) > (getExtent().getZ() + aabb.getExtent().getZ()))
+        if((Math.abs(getCenter().getZ() - other.getCenter().getZ())) > (getExtent().getZ() + other.getExtent().getZ()))
             return false;
         
         return true;
@@ -248,5 +248,4 @@ public class AABB {
             max = x2;
         }
     }
-
 }
