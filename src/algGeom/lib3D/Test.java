@@ -138,8 +138,7 @@ public class Test extends Frame implements GLEventListener,
     DrawAxis dAxis = new DrawAxis();
     DrawTriangleMesh dtm1;
     DrawTriangleMesh dtm2;
-    DrawAABB da1;
-    DrawAABB da2;
+    ArrayList<DrawAABB> das; 
 
     public void initLight(GL gl) {
         gl.glPushMatrix();
@@ -167,13 +166,19 @@ public class Test extends Frame implements GLEventListener,
             TriangleMesh mesh1 = new TriangleMesh("modelos/cat.obj");
             dtm1 = new DrawTriangleMesh(mesh1);
             TriangleMesh mesh2 = new TriangleMesh("modelos/cat.obj");
-            mesh2.translate(new Vect3d(155, 0, 0));
+            mesh2.translate(new Vect3d(150, 0, 0));
             dtm2 = new DrawTriangleMesh(mesh2);
-            Octree tree1 = new Octree(mesh1, 8);
-            da1 = new DrawAABB(mesh1.getAABB());
-            da2 = new DrawAABB(mesh2.getAABB());
-            Octree tree2 = new Octree(mesh2, 8);
-            System.out.println(tree1.collision(tree2));
+            Octree tree1 = new Octree(mesh1, 10);
+            Octree tree2 = new Octree(mesh2, 10);
+            ArrayList<AABB> aabbs = new ArrayList<AABB>();
+            long start = System.currentTimeMillis();
+            System.out.println(tree1.collision(tree2, aabbs));
+            long end = System.currentTimeMillis();
+            System.out.println("it tooks : " + (end - start));
+            das = new ArrayList<DrawAABB>();
+            for(int i = 0; i < aabbs.size(); i++){
+                das.add(new DrawAABB(aabbs.get(i)));
+            }
         } catch (IOException ex) {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -234,8 +239,9 @@ public class Test extends Frame implements GLEventListener,
     public void displayExerciseA(GL gl) {
         dtm1.drawObjectC(gl, 1, 0, 0);
         dtm2.drawObjectC(gl, 0, 0, 1);
-        da1.drawObjectC(gl, 1, 0, 0);
-        da2.drawObjectC(gl, 0, 0, 1);
+        for(int i = 0; i < das.size(); i++){
+            das.get(i).drawObject(gl);
+        }
     }
 
     public void display(GLAutoDrawable drawable) {

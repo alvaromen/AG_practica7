@@ -32,7 +32,7 @@ class Node {
         triangles = new ArrayList<Triangle3d>();
         sonsInstantiated = false;
         isLeaf = true;
-        maxSons = 10;
+        maxSons = 8;
     }
 
     public void insertTriangle(Triangle3d t) {
@@ -133,11 +133,15 @@ class Node {
         sonsInstantiated = true;
     }
 
-    public boolean collision(Node other, String path) {
+    public boolean collision(Node other, ArrayList<AABB> aabbs) {
         if (isLeaf) {
             if (other.isLeaf) {
                 if(aabb.testAABBAABB(other.aabb)){ //if both of them are leaves, then return true if they collide
-                    System.out.println(toString() + " " + other.toString());
+                    aabbs.add(aabb);
+                    aabbs.add(other.aabb);
+                    System.out.println(level);
+//                    System.out.println(aabb.min.x + " " + aabb.min.y + " " + aabb.min.z + ", " + aabb.max.x + " " + aabb.max.y + " " + aabb.max.z);
+//                    System.out.println(other.aabb.min.x + " " + other.aabb.min.y + " " + other.aabb.min.z + ", " + other.aabb.max.x + " " + other.aabb.max.y + " " + other.aabb.max.z);
                     return true;
                 }
                 /*
@@ -151,7 +155,7 @@ class Node {
             } else { // if we are not in a leaf of the other octree, we have to keep going down
                 for (int i = 0; i < other.sons.length; i++) {
                     if (aabb.testAABBAABB(other.sons[i].aabb)) {
-                        if(collision(sons[i], path)){
+                        if(collision(sons[i], aabbs)){
                                 System.out.println(toString() + " " + other.toString());
                             return true;
                         }
@@ -162,8 +166,9 @@ class Node {
             if (other.isLeaf) { // if we are in a leaf in the other octree, we have to keep going down in the first octree
                 for (int i = 0; i < sons.length; i++) {
                     if (other.aabb.testAABBAABB(sons[i].aabb)) {
-                        if(sons[i].collision(other, path)){
-                                System.out.println(toString() + " " + other.toString());
+                        if(sons[i].collision(other, aabbs)){
+                            aabbs.add(aabb);
+                            aabbs.add(other.aabb);
                             return true;
                         }
                     }
@@ -172,8 +177,9 @@ class Node {
                 for(int i = 0; i < sons.length; i++){
                     for(int j = 0; j < other.sons.length; j++){
                         if(sons[i].aabb.testAABBAABB(other.sons[j].aabb)){
-                            if(sons[i].collision(other.sons[j], path)){
-                                System.out.println(toString() + " " + other.toString());
+                            if(sons[i].collision(other.sons[j], aabbs)){
+                                aabbs.add(aabb);
+                                aabbs.add(other.aabb);
                                 return true;
                             }
                         }
@@ -220,10 +226,8 @@ public class Octree {
         return maxLevel;
     }
 
-    public boolean collision(Octree other) {
-        String s = new String();
-        if(root.collision(other.root, s)){
-            System.out.println(s);
+    public boolean collision(Octree other, ArrayList<AABB> aabbs) {
+        if(root.collision(other.root, aabbs)){
             return true;
         } else return false;
     }
