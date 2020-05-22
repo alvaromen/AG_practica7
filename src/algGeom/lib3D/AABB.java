@@ -248,4 +248,9 @@ public class AABB {
             max = x2;
         }
     }
+    
+    @Override
+    public String toString(){
+        return "( " + min.x + ", " + min.y + ", " + min.z + " ), ( " + + max.x + ", " + max.y + ", " + max.z + " ) "; 
+    }
 }

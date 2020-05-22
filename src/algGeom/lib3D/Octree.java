@@ -70,7 +70,7 @@ class Node {
 
         double medX = (maxX + minX) / 2;
         double medY = (maxY + minY) / 2;
-        double medZ = (maxZ + maxZ) / 2;
+        double medZ = (maxZ + minZ) / 2;
 
         sons[6] = new Node(this,
                 new AABB(
@@ -134,60 +134,81 @@ class Node {
     }
 
     public boolean collision(Node other, ArrayList<AABB> aabbs) {
-        if (isLeaf) {
-            if (other.isLeaf) {
-                if(aabb.testAABBAABB(other.aabb)){ //if both of them are leaves, then return true if they collide
+        boolean col = false;
+        if(aabb.testAABBAABB(other.aabb)){
+            if(isLeaf){
+                if(other.isLeaf){
+//                    System.out.println(level + " " + aabb);
+//                    System.out.println(other.level + " " + other.aabb);
                     aabbs.add(aabb);
                     aabbs.add(other.aabb);
-                    System.out.println(level);
-//                    System.out.println(aabb.min.x + " " + aabb.min.y + " " + aabb.min.z + ", " + aabb.max.x + " " + aabb.max.y + " " + aabb.max.z);
-//                    System.out.println(other.aabb.min.x + " " + other.aabb.min.y + " " + other.aabb.min.z + ", " + other.aabb.max.x + " " + other.aabb.max.y + " " + other.aabb.max.z);
-                    return true;
-                }
-                /*
-                // if we want more precission we should check the triangles
-                for(int i = 0; i < triangles.size(); i++){
-                    for(int j = 0; j < other.triangles.size(); j++){
-                        triangles.get(i).
-                    }
-                }
-                */
-            } else { // if we are not in a leaf of the other octree, we have to keep going down
-                for (int i = 0; i < other.sons.length; i++) {
-                    if (aabb.testAABBAABB(other.sons[i].aabb)) {
-                        if(collision(sons[i], aabbs)){
-                                System.out.println(toString() + " " + other.toString());
-                            return true;
-                        }
-                    }
-                }
-            }
-        } else {
-            if (other.isLeaf) { // if we are in a leaf in the other octree, we have to keep going down in the first octree
-                for (int i = 0; i < sons.length; i++) {
-                    if (other.aabb.testAABBAABB(sons[i].aabb)) {
-                        if(sons[i].collision(other, aabbs)){
+                    col = true;
+                } else {
+                    boolean repeat = true;
+                    int i = 0;
+                    do{
+                        if(collision(other.sons[i], aabbs)){
+//                            System.out.println(level + " " + aabb);
+//                            System.out.println(other.level + " " + other.aabb);
                             aabbs.add(aabb);
                             aabbs.add(other.aabb);
-                            return true;
+                            col = true;
+//                            repeat = false;
+                        } else {
+                            i++;
                         }
-                    }
+                    } while (repeat && i < other.maxSons);
+//                    if(repeat){
+//                        System.out.println("No coalisionan");
+//                        col = false;
+//                    }
                 }
-            } else { // if both of them are not a leaf, we have to keep going down in both octrees
-                for(int i = 0; i < sons.length; i++){
-                    for(int j = 0; j < other.sons.length; j++){
-                        if(sons[i].aabb.testAABBAABB(other.sons[j].aabb)){
+            } else {
+                if(other.isLeaf){
+                    boolean repeat = true;
+                    int i = 0;
+                    do{
+                        if(sons[i].collision(other, aabbs)){
+//                            System.out.println(level + " " + aabb);
+//                            System.out.println(other.level + " " + other.aabb);
+                            aabbs.add(aabb);
+                            aabbs.add(other.aabb);
+                            col = true;
+//                            repeat = false;
+                        } else {
+                            i++;
+                        }
+                    } while (repeat && i < other.maxSons);
+//                    if(repeat){
+//                        col = false;
+//                    }
+                } else {
+                    boolean repeat = true;
+                    int i = 0;
+                    do{
+                        int j = 0;
+                        do{
                             if(sons[i].collision(other.sons[j], aabbs)){
+//                                System.out.println(level + " " + aabb);
+//                                System.out.println(other.level + " " + other.aabb);
                                 aabbs.add(aabb);
                                 aabbs.add(other.aabb);
-                                return true;
+                                col = true;
+//                                repeat = false;
+                            } else {
+                                j++;
                             }
-                        }
-                    }
+                        } while(repeat && j < maxSons);
+                        i++;
+                    } while (repeat && i < other.maxSons);
+//                    if(repeat){
+//                        System.out.println("No coalisionan");
+//                        col = false;
+//                    }
                 }
             }
         }
-        return false;
+        return col;
     }
     
     @Override

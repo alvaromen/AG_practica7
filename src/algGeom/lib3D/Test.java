@@ -166,7 +166,7 @@ public class Test extends Frame implements GLEventListener,
             TriangleMesh mesh1 = new TriangleMesh("modelos/cat.obj");
             dtm1 = new DrawTriangleMesh(mesh1);
             TriangleMesh mesh2 = new TriangleMesh("modelos/cat.obj");
-            mesh2.translate(new Vect3d(150, 0, 0));
+            mesh2.translate(new Vect3d(145, 0, 0));
             dtm2 = new DrawTriangleMesh(mesh2);
             Octree tree1 = new Octree(mesh1, 10);
             Octree tree2 = new Octree(mesh2, 10);
