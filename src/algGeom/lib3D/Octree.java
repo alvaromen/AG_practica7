@@ -44,12 +44,11 @@ class Node {
                 if (triangles.size() > maxSons) { // if it has more triangles than the maximum, split into his sons
                     if (!sonsInstantiated) { // it should instantiate anyway but lets check it
                         instantiateSons();
-                        isLeaf = false; // now it has sons, so it is not a leaf
                     }
                 }
             } else { //if it is not a leaf, then add in the appropiate sons
                 for (int i = 0; i < sons.length; i++) {
-                    if (t.getAABB().testAABBAABB(sons[i].aabb)) {
+                    if (sons[i].aabb.aabb_tri(t)) {
                         sons[i].insertTriangle(t);
                     }
                 }
@@ -58,6 +57,8 @@ class Node {
     }
 
     void instantiateSons() {
+        isLeaf = false; // now it has sons, so it is not a leaf
+        
         sons = new Node[8];
 
         double minX = aabb.getMin().getX();
@@ -122,7 +123,8 @@ class Node {
 
         for (int i = 0; i < triangles.size(); i++) {
             for (int j = 0; j < sons.length; j++) {
-                if (triangles.get(i).getAABB().testAABBAABB(sons[j].aabb)) {
+//                if (triangles.get(i).getAABB().testAABBAABB(sons[j].aabb)) {
+                if (sons[j].aabb.aabb_tri(triangles.get(i))){
                     sons[j].insertTriangle(triangles.get(i));
                 }
             }
@@ -133,82 +135,74 @@ class Node {
         sonsInstantiated = true;
     }
 
-    public boolean collision(Node other, ArrayList<AABB> aabbs) {
+    public boolean collision(Node other, ArrayList<AABB> aabbs1, ArrayList<AABB> aabbs2) {
         boolean col = false;
         if(aabb.testAABBAABB(other.aabb)){
             if(isLeaf){
                 if(other.isLeaf){
-//                    System.out.println(level + " " + aabb);
-//                    System.out.println(other.level + " " + other.aabb);
-                    aabbs.add(aabb);
-                    aabbs.add(other.aabb);
-                    col = true;
+                    if(!triangles.isEmpty() && !other.triangles.isEmpty()){
+//                        System.out.println("Collision found at level: " + level);
+                        col = true;
+                    }
                 } else {
-                    boolean repeat = true;
                     int i = 0;
                     do{
-                        if(collision(other.sons[i], aabbs)){
-//                            System.out.println(level + " " + aabb);
-//                            System.out.println(other.level + " " + other.aabb);
-                            aabbs.add(aabb);
-                            aabbs.add(other.aabb);
+                        if(collision(other.sons[i], aabbs1, aabbs2)){
                             col = true;
-//                            repeat = false;
-                        } else {
-                            i++;
                         }
-                    } while (repeat && i < other.maxSons);
-//                    if(repeat){
-//                        System.out.println("No coalisionan");
-//                        col = false;
-//                    }
+                        i++;
+                    } while (i < other.maxSons);
                 }
             } else {
                 if(other.isLeaf){
-                    boolean repeat = true;
                     int i = 0;
                     do{
-                        if(sons[i].collision(other, aabbs)){
-//                            System.out.println(level + " " + aabb);
-//                            System.out.println(other.level + " " + other.aabb);
-                            aabbs.add(aabb);
-                            aabbs.add(other.aabb);
+                        if(sons[i].collision(other, aabbs1, aabbs2)){
                             col = true;
-//                            repeat = false;
-                        } else {
-                            i++;
                         }
-                    } while (repeat && i < other.maxSons);
-//                    if(repeat){
-//                        col = false;
-//                    }
+                        i++;
+                    } while (i < other.maxSons);
                 } else {
-                    boolean repeat = true;
                     int i = 0;
                     do{
                         int j = 0;
                         do{
-                            if(sons[i].collision(other.sons[j], aabbs)){
-//                                System.out.println(level + " " + aabb);
-//                                System.out.println(other.level + " " + other.aabb);
-                                aabbs.add(aabb);
-                                aabbs.add(other.aabb);
+                            if(sons[i].collision(other.sons[j], aabbs1, aabbs2)){
                                 col = true;
-//                                repeat = false;
-                            } else {
-                                j++;
                             }
-                        } while(repeat && j < maxSons);
+                            j++;
+                        } while(j < maxSons);
                         i++;
-                    } while (repeat && i < other.maxSons);
-//                    if(repeat){
-//                        System.out.println("No coalisionan");
-//                        col = false;
-//                    }
+                    } while (i < other.maxSons);
                 }
             }
         }
+        if(col){
+            if(!aabbs1.contains(aabb)){
+                aabbs1.add(aabb);
+            }
+            if(!aabbs2.contains(other.aabb)){
+                aabbs2.add(other.aabb);
+            }
+        }
         return col;
+    }
+    
+    public void untilMaxLevel() {
+        if(level != octree.getMaxLevel()){
+            if(isLeaf){
+                if(!triangles.isEmpty()){
+                    instantiateSons();
+                    for(int i = 0; i < sons.length; i++){
+                        sons[i].untilMaxLevel();
+                    }
+                }
+            } else {
+                for(int i = 0; i < sons.length; i++){
+                    sons[i].untilMaxLevel();
+                }
+            }
+        }
     }
     
     @Override
@@ -247,10 +241,14 @@ public class Octree {
         return maxLevel;
     }
 
-    public boolean collision(Octree other, ArrayList<AABB> aabbs) {
-        if(root.collision(other.root, aabbs)){
+    public boolean collision(Octree other, ArrayList<AABB> aabbs1, ArrayList<AABB> aabbs2) {
+        if(root.collision(other.root, aabbs1, aabbs2)){
             return true;
         } else return false;
+    }
+    
+    public void untilMaxLevel() {
+        root.untilMaxLevel();
     }
     
     public String toString(){

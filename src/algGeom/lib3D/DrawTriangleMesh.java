@@ -16,14 +16,11 @@ public class DrawTriangleMesh extends Draw {
 
     @Override
     public void drawObject(GL g) {
-        g.glColor3f(1, 0, 0);
         for (int i = 0; i < m.getFacesSize(); i++) {
             Triangle3d t = new Triangle3d(m.getTriangle(i));
             DrawTriangle3d dt = new DrawTriangle3d(t);
             dt.drawObject(g);
         }
-
-
         g.glEnd();
 
     }

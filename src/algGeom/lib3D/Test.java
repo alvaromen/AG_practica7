@@ -138,7 +138,10 @@ public class Test extends Frame implements GLEventListener,
     DrawAxis dAxis = new DrawAxis();
     DrawTriangleMesh dtm1;
     DrawTriangleMesh dtm2;
-    ArrayList<DrawAABB> das; 
+    DrawAABB da1;
+    DrawAABB da2;
+    ArrayList<DrawAABB> das1;
+    ArrayList<DrawAABB> das2;
 
     public void initLight(GL gl) {
         gl.glPushMatrix();
@@ -162,22 +165,90 @@ public class Test extends Frame implements GLEventListener,
     }
 
     public void initExerciseA(GL gl) {
+        long start, end, time;
         try {
-            TriangleMesh mesh1 = new TriangleMesh("modelos/cat.obj");
+            start = System.currentTimeMillis();
+            // cat models
+//            TriangleMesh mesh1 = new TriangleMesh("modelos/cat.obj");
+//            TriangleMesh mesh2 = new TriangleMesh("modelos/cat.obj");
+//            end = System.currentTimeMillis();
+//            time = end - start;
+//            mesh2.translate(new Vect3d(100, 0, 70));
+            
+            //beer can models
+            TriangleMesh mesh1 = new TriangleMesh("modelos/lata_cerveza.obj");
+            TriangleMesh mesh2 = new TriangleMesh("modelos/lata_cerveza.obj");
+            end = System.currentTimeMillis();
+            time = end - start;
+            mesh2.translate(new Vect3d(60, 0, 24));
+
+
+            if(time > 1000){
+                time /= 1000;
+            }
+            System.out.println("Time to load models: " + time + " milliseconds.");
+            
             dtm1 = new DrawTriangleMesh(mesh1);
-            TriangleMesh mesh2 = new TriangleMesh("modelos/cat.obj");
-            mesh2.translate(new Vect3d(145, 0, 0));
+            da1 = new DrawAABB(mesh1.getAABB());
             dtm2 = new DrawTriangleMesh(mesh2);
-            Octree tree1 = new Octree(mesh1, 10);
-            Octree tree2 = new Octree(mesh2, 10);
-            ArrayList<AABB> aabbs = new ArrayList<AABB>();
-            long start = System.currentTimeMillis();
-            System.out.println(tree1.collision(tree2, aabbs));
-            long end = System.currentTimeMillis();
-            System.out.println("it tooks : " + (end - start));
-            das = new ArrayList<DrawAABB>();
-            for(int i = 0; i < aabbs.size(); i++){
-                das.add(new DrawAABB(aabbs.get(i)));
+            da2 = new DrawAABB(mesh2.getAABB());
+            start = System.currentTimeMillis();
+            Octree tree1 = new Octree(mesh1, 9);
+            Octree tree2 = new Octree(mesh2, 9);
+            end = System.currentTimeMillis();
+            time = end - start;
+            if(time > 1000){
+                time /= 1000;
+                System.out.println("\nTime to build the octrees: " + time + " seconds.");
+            } else {
+                System.out.println("\nTime to build the octrees: " + time + " milliseconds.");
+            }
+            
+            start = System.currentTimeMillis();
+            tree1.untilMaxLevel();
+            tree2.untilMaxLevel();
+            end = System.currentTimeMillis();
+            time = end - start;
+            if(time > 1000){
+                time /= 1000;
+                System.out.println("\nTime to reach the max levels: " + time + " seconds.");
+            } else {
+                System.out.println("\nTime to reach the max levels: " + time + " milliseconds.");
+            }
+            
+            ArrayList<AABB> aabbs1 = new ArrayList<AABB>();
+            ArrayList<AABB> aabbs2 = new ArrayList<AABB>();
+            start = System.currentTimeMillis();
+            boolean collision = tree1.collision(tree2, aabbs1, aabbs2);
+            end = System.currentTimeMillis();
+            
+            time = end - start;
+            if(time > 1000){
+                time = (long) (time / 1000);
+                System.out.println("\nTime to get if there is a collision : " + time + " seconds.");
+            } else {
+                System.out.println("\nTime to get if there is a collision : " + time + " milliseconds.");
+            }
+            
+            if(collision){
+                System.out.println("\n");
+                System.out.println("**************************");
+                System.out.println("**The two models collide**");
+                System.out.println("**************************");
+            } else {
+                System.out.println("\n");
+                System.out.println("*********************************");
+                System.out.println("**The two models do not collide**");
+                System.out.println("*********************************");
+            }
+            
+            das1 = new ArrayList<DrawAABB>();
+            for(int i = 0; i < aabbs1.size(); i++){
+                das1.add(new DrawAABB(aabbs1.get(i)));
+            }
+            das2 = new ArrayList<DrawAABB>();
+            for(int i = 0; i < aabbs2.size(); i++){
+                das2.add(new DrawAABB(aabbs2.get(i)));
             }
         } catch (IOException ex) {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
@@ -239,8 +310,13 @@ public class Test extends Frame implements GLEventListener,
     public void displayExerciseA(GL gl) {
         dtm1.drawObjectC(gl, 1, 0, 0);
         dtm2.drawObjectC(gl, 0, 0, 1);
-        for(int i = 0; i < das.size(); i++){
-            das.get(i).drawObject(gl);
+        da1.drawObjectC(gl, 1, 0, 0);
+        da2.drawObjectC(gl, 0, 0, 1);
+        for(int i = 0; i < das1.size(); i++){
+            das1.get(i).drawObjectC(gl, 1, 0, 0);
+        }
+        for(int i = 0; i < das2.size(); i++){
+            das2.get(i).drawObjectC(gl, 0, 0, 1);
         }
     }
 

@@ -139,5 +139,10 @@ public class Vect3d {
         System.out.print("Coordinate z: ");
         System.out.println(z);
     }
+    
+    @Override
+    public String toString(){
+        return "( " + x + ", " + y + ", " + z + " )";
+    }
 
 }

@@ -251,6 +251,6 @@ public class AABB {
     
     @Override
     public String toString(){
-        return "( " + min.x + ", " + min.y + ", " + min.z + " ), ( " + + max.x + ", " + max.y + ", " + max.z + " ) "; 
+        return min + ", " + max; 
     }
 }

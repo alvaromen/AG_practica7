@@ -255,5 +255,10 @@ public class Triangle3d {
             return false;
         }
     }
+    
+    @Override
+    public String toString(){
+        return getA() + " " + getB() + " " + getC();
+    }
 
 }
