@@ -136,10 +136,14 @@ public class Test extends Frame implements GLEventListener,
     static boolean visualizeAxis = true;
 
     DrawAxis dAxis = new DrawAxis();
+    TriangleMesh mesh1;
+    TriangleMesh mesh2;
     DrawTriangleMesh dtm1;
     DrawTriangleMesh dtm2;
     ArrayList<DrawAABB> das1;
     ArrayList<DrawAABB> das2;
+    ArrayList<DrawTriangle3d> dts;
+    int a = 0;
 
     public void initLight(GL gl) {
         gl.glPushMatrix();
@@ -167,19 +171,22 @@ public class Test extends Frame implements GLEventListener,
         try {
             start = System.currentTimeMillis();
             // cat models
-//            TriangleMesh mesh1 = new TriangleMesh("modelos/cat.obj");
-//            TriangleMesh mesh2 = new TriangleMesh("modelos/cat.obj");
-//            end = System.currentTimeMillis();
-//            time = end - start;
-//            mesh2.translate(new Vect3d(100, 0, 70));
-            
-            //beer can models
-            TriangleMesh mesh1 = new TriangleMesh("modelos/lata_cerveza.obj");
-            TriangleMesh mesh2 = new TriangleMesh("modelos/lata_cerveza.obj");
+            mesh1 = new TriangleMesh("modelos/cat.obj");
+            mesh2 = new TriangleMesh("modelos/cat.obj");
             end = System.currentTimeMillis();
             long timeLoading = end - start;
             totalTime += timeLoading;
-            mesh2.translate(new Vect3d(60, 0, 24));
+            mesh1.move(new Vect3d(-100, 0, 100));
+            mesh2.move(new Vect3d(100, 0, 100));
+            
+            //beer can models
+//            mesh1 = new TriangleMesh("modelos/lata_cerveza.obj");
+//            mesh2 = new TriangleMesh("modelos/lata_cerveza.obj");
+//            end = System.currentTimeMillis();
+//            long timeLoading = end - start;
+//            totalTime += timeLoading;
+//            mesh1.move(new Vect3d(-50, 0, 0));
+//            mesh2.move(new Vect3d(50, 0, 24));
 
 
             if(timeLoading > 1000){
@@ -187,11 +194,11 @@ public class Test extends Frame implements GLEventListener,
             }
             System.out.println("Time to load models: " + timeLoading + " milliseconds.");
             
-            dtm1 = new DrawTriangleMesh(mesh1);
-            dtm2 = new DrawTriangleMesh(mesh2);
+            dtm1 = new DrawTriangleMesh(mesh1, false, 0.5f);
+            dtm2 = new DrawTriangleMesh(mesh2, false, 0.5f);
             start = System.currentTimeMillis();
-            Octree tree1 = new Octree(mesh1, 9);
-            Octree tree2 = new Octree(mesh2, 9);
+            Octree tree1 = new Octree(mesh1, 12);
+            Octree tree2 = new Octree(mesh2, 12);
             end = System.currentTimeMillis();
             long timeBuilding = end - start;
             totalTime += timeBuilding;
@@ -202,23 +209,25 @@ public class Test extends Frame implements GLEventListener,
                 System.out.println("\nTime to build the octrees: " + timeBuilding + " milliseconds.");
             }
             
-            start = System.currentTimeMillis();
-            tree1.untilMaxLevel();
-            tree2.untilMaxLevel();
-            end = System.currentTimeMillis();
-            long timeDeepening = end - start;
-            totalTime += timeDeepening;
-            if(timeDeepening > 1000){
-                timeDeepening /= 1000;
-                System.out.println("\nTime to reach the max levels: " + timeDeepening + " seconds.");
-            } else {
-                System.out.println("\nTime to reach the max levels: " + timeDeepening + " milliseconds.");
-            }
+//            start = System.currentTimeMillis();
+//            int level = 9;
+//            tree1.adjustAtLevel(level);
+//            tree2.adjustAtLevel(level);
+//            end = System.currentTimeMillis();
+//            long timeDeepening = end - start;
+//            totalTime += timeDeepening;
+//            if(timeDeepening > 1000){
+//                timeDeepening /= 1000;
+//                System.out.println("\nTime to reach the level " + level + " : " + timeDeepening + " seconds.");
+//            } else {
+//                System.out.println("\nTime to reach the level: " + timeDeepening + " milliseconds.");
+//            }
             
             ArrayList<AABB> aabbs1 = new ArrayList<AABB>();
             ArrayList<AABB> aabbs2 = new ArrayList<AABB>();
+            ArrayList<Triangle3d> triangles = new ArrayList<Triangle3d>();
             start = System.currentTimeMillis();
-            boolean collision = tree1.collision(tree2, aabbs1, aabbs2);
+            boolean collision = tree1.collision(tree2, aabbs1, aabbs2, triangles);
             end = System.currentTimeMillis();
             
             long timeFindingCollisions = end - start;
@@ -232,29 +241,41 @@ public class Test extends Frame implements GLEventListener,
             
             System.out.println("\nTotal time in the full process : " + totalTime + " milliseconds.");
             
+            das1 = new ArrayList<DrawAABB>();
+            das2 = new ArrayList<DrawAABB>();
+            dts = new ArrayList<DrawTriangle3d>();
+            
             if(collision){
                 System.out.println("\n");
                 System.out.println("**************************");
                 System.out.println("**The two models collide**");
                 System.out.println("**************************");
+            
+                for(int i = 0; i < aabbs1.size(); i++){
+                    das1.add(new DrawAABB(aabbs1.get(i), 2));
+                }
+                for(int i = 0; i < aabbs2.size(); i++){
+                    das2.add(new DrawAABB(aabbs2.get(i), 2));
+                }
+                for(int i = 0; i < aabbs2.size(); i++){
+                    dts.add(new DrawTriangle3d(triangles.get(i)));
+                }
             } else {
                 System.out.println("\n");
                 System.out.println("*********************************");
                 System.out.println("**The two models do not collide**");
                 System.out.println("*********************************");
             }
-            
-            das1 = new ArrayList<DrawAABB>();
-            for(int i = 0; i < aabbs1.size(); i++){
-                das1.add(new DrawAABB(aabbs1.get(i)));
-            }
-            das2 = new ArrayList<DrawAABB>();
-            for(int i = 0; i < aabbs2.size(); i++){
-                das2.add(new DrawAABB(aabbs2.get(i)));
-            }
         } catch (IOException ex) {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //Prueba triángulos
+//        Triangle3d t1 = new Triangle3d(20, 0, 0, 0, 20, 0, -20, 0, 0);
+//        Triangle3d t2 = new Triangle3d(20, 10, 0, 15, 10, 20, 15, 10, -20);
+//        System.out.println(t1.intersectionTriTri(t2));
+//        dts = new ArrayList<DrawTriangle3d>();
+//        dts.add(new DrawTriangle3d(t1));
+//        dts.add(new DrawTriangle3d(t2));
     }
 
     public void init(GLAutoDrawable drawable) {
@@ -310,6 +331,71 @@ public class Test extends Frame implements GLEventListener,
     }
 
     public void displayExerciseA(GL gl) {
+        if((a != 0) && (a % 30 == 0)){
+            mesh1.move(new Vect3d(5, 0, 0));
+            mesh2.move(new Vect3d(-5, 0, 0));
+            dtm1 = new DrawTriangleMesh(mesh1, false, 0.5f);
+            dtm2 = new DrawTriangleMesh(mesh2, false, 0.5f);
+            
+            long start, end;
+            
+            start = System.currentTimeMillis();
+            Octree tree1 = new Octree(mesh1, 12);
+            Octree tree2 = new Octree(mesh2, 12);
+            end = System.currentTimeMillis();
+            long timeBuilding = end - start;
+            
+            if(timeBuilding > 1000){
+                timeBuilding /= 1000;
+                System.out.println("\nTime to build the octrees: " + timeBuilding + " seconds.");
+            } else {
+                System.out.println("\nTime to build the octrees: " + timeBuilding + " milliseconds.");
+            }
+            
+            ArrayList<AABB> aabbs1 = new ArrayList<AABB>();
+            ArrayList<AABB> aabbs2 = new ArrayList<AABB>();
+            ArrayList<Triangle3d> triangles = new ArrayList<Triangle3d>();
+            start = System.currentTimeMillis();
+            boolean collision = tree1.collision(tree2, aabbs1, aabbs2, triangles);
+            end = System.currentTimeMillis();
+            
+            long timeFindingCollisions = end - start;
+            if(timeFindingCollisions > 1000){
+                timeFindingCollisions /= 1000;
+                System.out.println("\nTime to get if there is a collision : " + timeFindingCollisions + " seconds.");
+            } else {
+                System.out.println("\nTime to get if there is a collision : " + timeFindingCollisions + " milliseconds.");
+            }
+            
+            das1 = new ArrayList<DrawAABB>();
+            das2 = new ArrayList<DrawAABB>();
+            dts = new ArrayList<DrawTriangle3d>();
+            
+            if(collision){
+                System.out.println("\n");
+                System.out.println("**************************");
+                System.out.println("**The two models collide**");
+                System.out.println("**************************");                
+            
+                das1 = new ArrayList<DrawAABB>();
+                for(int i = 0; i < aabbs1.size(); i++){
+                    das1.add(new DrawAABB(aabbs1.get(i), 2));
+                }
+                das2 = new ArrayList<DrawAABB>();
+                for(int i = 0; i < aabbs2.size(); i++){
+                    das2.add(new DrawAABB(aabbs2.get(i), 2));
+                }
+                dts = new ArrayList<DrawTriangle3d>();
+                for(int i = 0; i < triangles.size(); i++){
+                    dts.add(new DrawTriangle3d(triangles.get(i)));
+                }
+            } else {
+                System.out.println("\n");
+                System.out.println("*********************************");
+                System.out.println("**The two models do not collide**");
+                System.out.println("*********************************");
+            }
+        }
         dtm1.drawObjectC(gl, 1, 0, 0);
         dtm2.drawObjectC(gl, 0, 0, 1);
         for(int i = 0; i < das1.size(); i++){
@@ -318,6 +404,10 @@ public class Test extends Frame implements GLEventListener,
         for(int i = 0; i < das2.size(); i++){
             das2.get(i).drawObjectC(gl, 0, 0, 1);
         }
+        for(int i = 0; i < dts.size(); i++){
+            dts.get(i).drawObjectC(gl, 0, 0, 1);
+        }
+        a++;
     }
 
     public void display(GLAutoDrawable drawable) {

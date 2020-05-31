@@ -140,6 +140,14 @@ public class Vect3d {
         System.out.println(z);
     }
     
+    public double[] getCoordinates(){
+        double[] f = new double[3];
+        f[0] = x;
+        f[1] = y;
+        f[2] = z;
+        return f;
+    }
+    
     @Override
     public String toString(){
         return "( " + x + ", " + y + ", " + z + " )";

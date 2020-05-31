@@ -135,19 +135,42 @@ class Node {
         sonsInstantiated = true;
     }
 
-    public boolean collision(Node other, ArrayList<AABB> aabbs1, ArrayList<AABB> aabbs2) {
+    public boolean collision(Node other, ArrayList<AABB> aabbs1, ArrayList<AABB> aabbs2, ArrayList<Triangle3d> t) {
         boolean col = false;
         if(aabb.testAABBAABB(other.aabb)){
             if(isLeaf){
                 if(other.isLeaf){
                     if(!triangles.isEmpty() && !other.triangles.isEmpty()){
-                        System.out.println("Collision found at level: " + level);
+//                        for(int i = 0; i < triangles.size(); i++){
+//                            for(int j = 0; j < other.triangles.size(); j++){
+//                                if(triangles.get(i).intersectionTriTri(other.triangles.get(j))){
+//                                    //System.out.println("Collision found at level: " + level);
+//                                    if(!t.contains(triangles.get(i))){
+//                                        t.add(triangles.get(i));
+//                                    }
+//                                    if(!t.contains(other.triangles.get(j))){
+//                                        t.add(other.triangles.get(j));
+//                                    }
+//                                    col = true;
+//                                }
+//                            }
+//                        }
+                        for(int i = 0; i < triangles.size(); i++){
+                            if(!t.contains(triangles.get(i))){
+                                t.add(triangles.get(i));
+                            }
+                        }
+                        for(int i = 0; i < other.triangles.size(); i++){
+                            if(!t.contains(other.triangles.get(i))){
+                                t.add(other.triangles.get(i));
+                            }
+                        }
                         col = true;
                     }
                 } else {
                     int i = 0;
                     do{
-                        if(collision(other.sons[i], aabbs1, aabbs2)){
+                        if(collision(other.sons[i], aabbs1, aabbs2, t)){
                             col = true;
                         }
                         i++;
@@ -157,7 +180,7 @@ class Node {
                 if(other.isLeaf){
                     int i = 0;
                     do{
-                        if(sons[i].collision(other, aabbs1, aabbs2)){
+                        if(sons[i].collision(other, aabbs1, aabbs2, t)){
                             col = true;
                         }
                         i++;
@@ -167,7 +190,7 @@ class Node {
                     do{
                         int j = 0;
                         do{
-                            if(sons[i].collision(other.sons[j], aabbs1, aabbs2)){
+                            if(sons[i].collision(other.sons[j], aabbs1, aabbs2, t)){
                                 col = true;
                             }
                             j++;
@@ -188,18 +211,20 @@ class Node {
         return col;
     }
     
-    public void untilMaxLevel() {
-        if(level != octree.getMaxLevel()){
-            if(isLeaf){
-                if(!triangles.isEmpty()){
-                    instantiateSons();
-                    for(int i = 0; i < sons.length; i++){
-                        sons[i].untilMaxLevel();
+    public void adjustAtLevel(int l) {
+        if(level < octree.getMaxLevel()){
+            if(level < l){
+                if(isLeaf){
+                    if(!triangles.isEmpty()){
+                        instantiateSons();
+                        for(int i = 0; i < sons.length; i++){
+                            sons[i].adjustAtLevel(l);
+                        }
                     }
-                }
-            } else {
-                for(int i = 0; i < sons.length; i++){
-                    sons[i].untilMaxLevel();
+                } else {
+                    for(int i = 0; i < sons.length; i++){
+                        sons[i].adjustAtLevel(l);
+                    }
                 }
             }
         }
@@ -241,14 +266,12 @@ public class Octree {
         return maxLevel;
     }
 
-    public boolean collision(Octree other, ArrayList<AABB> aabbs1, ArrayList<AABB> aabbs2) {
-        if(root.collision(other.root, aabbs1, aabbs2)){
-            return true;
-        } else return false;
+    public boolean collision(Octree other, ArrayList<AABB> aabbs1, ArrayList<AABB> aabbs2, ArrayList<Triangle3d> triangles) {
+        return root.collision(other.root, aabbs1, aabbs2, triangles);
     }
     
-    public void untilMaxLevel() {
-        root.untilMaxLevel();
+    public void adjustAtLevel(int level) {
+        root.adjustAtLevel(level);
     }
     
     public String toString(){

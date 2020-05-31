@@ -8,26 +8,39 @@ public class DrawTriangle3d extends Draw {
 
     Triangle3d tr;
     Vect3d n;
-
-    /**
-     * Creates a new instance of VisuPunto
-     */
+    boolean drawTriangles;
+    float size;
+    
     public DrawTriangle3d(Triangle3d t) {
         tr = t;
         n = tr.normal();
+        drawTriangles = true;
+        size = 1;
+    }
+    
+    public DrawTriangle3d(Triangle3d t, boolean dt, float s) {
+        tr = t;
+        n = tr.normal();
+        drawTriangles = dt;
+        size = s;
     }
 
     @Override
     public void drawObject(GL g) {
+        
+        if(drawTriangles){
+            g.glColor3f(1,0,0);
+            g.glBegin(GL.GL_TRIANGLES);
+            g.glNormal3f((float) n.x, (float) n.y, (float) n.z);
+            g.glVertex3d((float) tr.a.x, (float) tr.a.y, (float) tr.a.z);
+            g.glVertex3d((float) tr.b.x, (float) tr.b.y, (float) tr.b.z);
+            g.glVertex3d((float) tr.c.x, (float) tr.c.y, (float) tr.c.z);
+            
+            
+            g.glEnd();
+        }
 
-        g.glColor3f(1,0,0);
-        g.glBegin(GL.GL_TRIANGLES);
-        g.glNormal3f((float) n.x, (float) n.y, (float) n.z);
-        g.glVertex3d((float) tr.a.x, (float) tr.a.y, (float) tr.a.z);
-        g.glVertex3d((float) tr.b.x, (float) tr.b.y, (float) tr.b.z);
-        g.glVertex3d((float) tr.c.x, (float) tr.c.y, (float) tr.c.z);
-
-        g.glEnd();
+        g.glLineWidth(size);
         
         g.glColor3f(0,0,1);
         g.glBegin(GL.GL_LINES);
@@ -38,7 +51,8 @@ public class DrawTriangle3d extends Draw {
         
         
         g.glEnd();
-
+        
+        g.glLineWidth(1);
     }
 
     @Override

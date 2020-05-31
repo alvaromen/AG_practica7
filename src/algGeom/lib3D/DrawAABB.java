@@ -6,9 +6,16 @@ import javax.media.opengl.*;
 public class DrawAABB extends Draw {
 
     AABB box;
+    float size;
 
     public DrawAABB(AABB box) {
         this.box = box;
+        size = 1;
+    }
+
+    public DrawAABB(AABB box, float s) {
+        this.box = box;
+        size = s;
     }
 
     public AABB getBox() {
@@ -17,6 +24,7 @@ public class DrawAABB extends Draw {
 
     @Override
     public void drawObject(GL g) {
+        g.glLineWidth(size);
         //face 0
         g.glBegin(GL.GL_LINE_STRIP);
         g.glVertex3d(box.min.getX(), box.min.getY(), box.min.getZ());

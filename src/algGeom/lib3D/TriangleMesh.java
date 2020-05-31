@@ -324,10 +324,10 @@ public final class TriangleMesh {
         return false;
     }
     
-    public void translate(Vect3d translation){
+    public void move(Vect3d moving){
         for(int i = 0; i < vertices.size(); i++){
 //            System.out.println("AAAAAA " + vertices.get(i).getX() + " " + vertices.get(i).getY() + " " + vertices.get(i).getZ());
-            Vect3d nv = vertices.get(i).add(translation);
+            Vect3d nv = vertices.get(i).add(moving);
             vertices.get(i).setVert(nv.getX(), nv.getY(), nv.getZ());
 //            System.out.println("BBBBBB " + vertices.get(i).getX() + " " + vertices.get(i).getY() + " " + vertices.get(i).getZ());
         }
