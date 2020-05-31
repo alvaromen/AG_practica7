@@ -141,7 +141,7 @@ class Node {
             if(isLeaf){
                 if(other.isLeaf){
                     if(!triangles.isEmpty() && !other.triangles.isEmpty()){
-//                        System.out.println("Collision found at level: " + level);
+                        System.out.println("Collision found at level: " + level);
                         col = true;
                     }
                 } else {

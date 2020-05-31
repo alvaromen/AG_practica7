@@ -138,8 +138,6 @@ public class Test extends Frame implements GLEventListener,
     DrawAxis dAxis = new DrawAxis();
     DrawTriangleMesh dtm1;
     DrawTriangleMesh dtm2;
-    DrawAABB da1;
-    DrawAABB da2;
     ArrayList<DrawAABB> das1;
     ArrayList<DrawAABB> das2;
 
@@ -165,7 +163,7 @@ public class Test extends Frame implements GLEventListener,
     }
 
     public void initExerciseA(GL gl) {
-        long start, end, time;
+        long start, end, totalTime = 0;
         try {
             start = System.currentTimeMillis();
             // cat models
@@ -179,41 +177,42 @@ public class Test extends Frame implements GLEventListener,
             TriangleMesh mesh1 = new TriangleMesh("modelos/lata_cerveza.obj");
             TriangleMesh mesh2 = new TriangleMesh("modelos/lata_cerveza.obj");
             end = System.currentTimeMillis();
-            time = end - start;
+            long timeLoading = end - start;
+            totalTime += timeLoading;
             mesh2.translate(new Vect3d(60, 0, 24));
 
 
-            if(time > 1000){
-                time /= 1000;
+            if(timeLoading > 1000){
+                timeLoading /= 1000;
             }
-            System.out.println("Time to load models: " + time + " milliseconds.");
+            System.out.println("Time to load models: " + timeLoading + " milliseconds.");
             
             dtm1 = new DrawTriangleMesh(mesh1);
-            da1 = new DrawAABB(mesh1.getAABB());
             dtm2 = new DrawTriangleMesh(mesh2);
-            da2 = new DrawAABB(mesh2.getAABB());
             start = System.currentTimeMillis();
             Octree tree1 = new Octree(mesh1, 9);
             Octree tree2 = new Octree(mesh2, 9);
             end = System.currentTimeMillis();
-            time = end - start;
-            if(time > 1000){
-                time /= 1000;
-                System.out.println("\nTime to build the octrees: " + time + " seconds.");
+            long timeBuilding = end - start;
+            totalTime += timeBuilding;
+            if(timeBuilding > 1000){
+                timeBuilding /= 1000;
+                System.out.println("\nTime to build the octrees: " + timeBuilding + " seconds.");
             } else {
-                System.out.println("\nTime to build the octrees: " + time + " milliseconds.");
+                System.out.println("\nTime to build the octrees: " + timeBuilding + " milliseconds.");
             }
             
             start = System.currentTimeMillis();
             tree1.untilMaxLevel();
             tree2.untilMaxLevel();
             end = System.currentTimeMillis();
-            time = end - start;
-            if(time > 1000){
-                time /= 1000;
-                System.out.println("\nTime to reach the max levels: " + time + " seconds.");
+            long timeDeepening = end - start;
+            totalTime += timeDeepening;
+            if(timeDeepening > 1000){
+                timeDeepening /= 1000;
+                System.out.println("\nTime to reach the max levels: " + timeDeepening + " seconds.");
             } else {
-                System.out.println("\nTime to reach the max levels: " + time + " milliseconds.");
+                System.out.println("\nTime to reach the max levels: " + timeDeepening + " milliseconds.");
             }
             
             ArrayList<AABB> aabbs1 = new ArrayList<AABB>();
@@ -222,13 +221,16 @@ public class Test extends Frame implements GLEventListener,
             boolean collision = tree1.collision(tree2, aabbs1, aabbs2);
             end = System.currentTimeMillis();
             
-            time = end - start;
-            if(time > 1000){
-                time = (long) (time / 1000);
-                System.out.println("\nTime to get if there is a collision : " + time + " seconds.");
+            long timeFindingCollisions = end - start;
+            totalTime += timeFindingCollisions;
+            if(timeFindingCollisions > 1000){
+                timeFindingCollisions /= 1000;
+                System.out.println("\nTime to get if there is a collision : " + timeFindingCollisions + " seconds.");
             } else {
-                System.out.println("\nTime to get if there is a collision : " + time + " milliseconds.");
+                System.out.println("\nTime to get if there is a collision : " + timeFindingCollisions + " milliseconds.");
             }
+            
+            System.out.println("\nTotal time in the full process : " + totalTime + " milliseconds.");
             
             if(collision){
                 System.out.println("\n");
@@ -310,8 +312,6 @@ public class Test extends Frame implements GLEventListener,
     public void displayExerciseA(GL gl) {
         dtm1.drawObjectC(gl, 1, 0, 0);
         dtm2.drawObjectC(gl, 0, 0, 1);
-        da1.drawObjectC(gl, 1, 0, 0);
-        da2.drawObjectC(gl, 0, 0, 1);
         for(int i = 0; i < das1.size(); i++){
             das1.get(i).drawObjectC(gl, 1, 0, 0);
         }
