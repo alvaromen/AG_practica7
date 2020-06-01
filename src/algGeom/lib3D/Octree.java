@@ -141,31 +141,31 @@ class Node {
             if(isLeaf){
                 if(other.isLeaf){
                     if(!triangles.isEmpty() && !other.triangles.isEmpty()){
+                        for(int i = 0; i < triangles.size(); i++){
+                            for(int j = 0; j < other.triangles.size(); j++){
+                                if(triangles.get(i).intersectionTriTri(other.triangles.get(j))){
+                                    //System.out.println("Collision found at level: " + level);
+                                    if(!t.contains(triangles.get(i))){
+                                        t.add(triangles.get(i));
+                                    }
+                                    if(!t.contains(other.triangles.get(j))){
+                                        t.add(other.triangles.get(j));
+                                    }
+                                    col = true;
+                                }
+                            }
+                        }
 //                        for(int i = 0; i < triangles.size(); i++){
-//                            for(int j = 0; j < other.triangles.size(); j++){
-//                                if(triangles.get(i).intersectionTriTri(other.triangles.get(j))){
-//                                    //System.out.println("Collision found at level: " + level);
-//                                    if(!t.contains(triangles.get(i))){
-//                                        t.add(triangles.get(i));
-//                                    }
-//                                    if(!t.contains(other.triangles.get(j))){
-//                                        t.add(other.triangles.get(j));
-//                                    }
-//                                    col = true;
-//                                }
+//                            if(!t.contains(triangles.get(i))){
+//                                t.add(triangles.get(i));
 //                            }
 //                        }
-                        for(int i = 0; i < triangles.size(); i++){
-                            if(!t.contains(triangles.get(i))){
-                                t.add(triangles.get(i));
-                            }
-                        }
-                        for(int i = 0; i < other.triangles.size(); i++){
-                            if(!t.contains(other.triangles.get(i))){
-                                t.add(other.triangles.get(i));
-                            }
-                        }
-                        col = true;
+//                        for(int i = 0; i < other.triangles.size(); i++){
+//                            if(!t.contains(other.triangles.get(i))){
+//                                t.add(other.triangles.get(i));
+//                            }
+//                        }
+//                        col = true;
                     }
                 } else {
                     int i = 0;

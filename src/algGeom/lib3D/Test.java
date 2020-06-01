@@ -171,22 +171,22 @@ public class Test extends Frame implements GLEventListener,
         try {
             start = System.currentTimeMillis();
             // cat models
-            mesh1 = new TriangleMesh("modelos/cat.obj");
-            mesh2 = new TriangleMesh("modelos/cat.obj");
-            end = System.currentTimeMillis();
-            long timeLoading = end - start;
-            totalTime += timeLoading;
-            mesh1.move(new Vect3d(-100, 0, 100));
-            mesh2.move(new Vect3d(100, 0, 100));
-            
-            //beer can models
-//            mesh1 = new TriangleMesh("modelos/lata_cerveza.obj");
-//            mesh2 = new TriangleMesh("modelos/lata_cerveza.obj");
+//            mesh1 = new TriangleMesh("modelos/cat.obj");
+//            mesh2 = new TriangleMesh("modelos/cat.obj");
 //            end = System.currentTimeMillis();
 //            long timeLoading = end - start;
 //            totalTime += timeLoading;
-//            mesh1.move(new Vect3d(-50, 0, 0));
-//            mesh2.move(new Vect3d(50, 0, 24));
+//            mesh1.move(new Vect3d(-100, 0, 100));
+//            mesh2.move(new Vect3d(100, 0, 100));
+            
+            //beer can models
+            mesh1 = new TriangleMesh("modelos/lata_cerveza.obj");
+            mesh2 = new TriangleMesh("modelos/lata_cerveza.obj");
+            end = System.currentTimeMillis();
+            long timeLoading = end - start;
+            totalTime += timeLoading;
+            mesh1.move(new Vect3d(-50, 0, 0));
+            mesh2.move(new Vect3d(50, 0, 24));
 
 
             if(timeLoading > 1000){
@@ -269,9 +269,9 @@ public class Test extends Frame implements GLEventListener,
         } catch (IOException ex) {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //Prueba tri·ngulos
+//        //Prueba tri√°ngulos
 //        Triangle3d t1 = new Triangle3d(20, 0, 0, 0, 20, 0, -20, 0, 0);
-//        Triangle3d t2 = new Triangle3d(20, 10, 0, 15, 10, 20, 15, 10, -20);
+//        Triangle3d t2 = new Triangle3d(20, 10, 0, -15, 10, 20, -15, 10, -20);
 //        System.out.println(t1.intersectionTriTri(t2));
 //        dts = new ArrayList<DrawTriangle3d>();
 //        dts.add(new DrawTriangle3d(t1));

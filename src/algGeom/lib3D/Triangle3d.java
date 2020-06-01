@@ -257,13 +257,52 @@ public class Triangle3d {
     }
 
     public boolean intersectionTriTri(Triangle3d other){
-        double[] V0 = a.getCoordinates();
-        double[] V1 = (a.add(b)).getCoordinates();
-        double[] V2 = (a.add(c)).getCoordinates();
-        double[] U0 = other.a.getCoordinates();
-        double[] U1 = other.a.add(other.b).getCoordinates();
-        double[] U2 = other.a.add(other.c).getCoordinates();
-        return NoDivTriTriIsect(V0, V1, V2, U0, U1, U2);
+//        double[] V0 = a.getCoordinates();
+//        double[] V1 = (a.add(b)).getCoordinates();
+//        double[] V2 = (a.add(c)).getCoordinates();
+//        double[] U0 = other.a.getCoordinates();
+//        double[] U1 = other.a.add(other.b).getCoordinates();
+//        double[] U2 = other.a.add(other.c).getCoordinates();
+//        return NoDivTriTriIsect(V0, V1, V2, U0, U1, U2);
+        return intersects(a, b, c, other.a, other.b, other.c);
+    }
+    
+    int vertexSign(Vect3d a, Vect3d b, Vect3d c, Vect3d d)
+    {
+        Vect3d ba = b.sub(a);
+
+        Vect3d ca = c.sub(a);
+
+        Vect3d da = d.sub(a);
+
+        double det = ba.getX() * ca.getY() * da.getZ() + ba.getY() * ca.getZ() * da.getX() + ca.getX() * da.getY() * ba.getZ() -
+        da.getX() * ca.getY() * ba.getZ() - ca.getX() * ba.getY() * da.getZ() - da.getY() * ca.getZ() * ba.getX();
+
+        return (det < 0 ? -1 :(det > 0 ? + 1 : 0));
+    }
+
+    boolean intersects_segment(Vect3d p1, Vect3d p2, Vect3d p3, Vect3d a, Vect3d b)
+    {
+        int s = vertexSign (a, p3, p2, p1);
+
+        return (s!= 0 &&
+            s == vertexSign (b, p1, p2, p3) &&
+            s == vertexSign (p1, a, b, p3) &&
+            s == vertexSign (p2, p3, b, a) &&
+            s == vertexSign (a, p1, b, p2));
+    }
+
+
+    // v es el primer triángulo y p es el segundo triángulo.
+
+    boolean intersects(Vect3d v1, Vect3d v2, Vect3d v3, Vect3d p1, Vect3d p2, Vect3d p3)
+    {
+        return (intersects_segment (v1,v2,v3,p1, p2) ||
+            intersects_segment (v1,v2,v3,p2,p3) ||
+            intersects_segment (v1,v2,v3,p3,p1) ||
+            intersects_segment (p1,p2,p3,v1,v2 ) ||
+            intersects_segment (p1,p2,p3,v2,v3 ) ||
+            intersects_segment (p1,p2,p3,v3,v1 ));
     }
 
 
